@@ -667,6 +667,416 @@ function renderLists() {
 
         <div class="actions">
           <button onclick="customerProfile('${customer.id}')">Ver ficha</button>
+          <button class="secondary" onclick="navigatelet reminders = [];
+let profile = null;
+let paidEmoji = localStorage.getItem('rumboPaidEmoji') || '💰';
+let holdTimer = null;
+let holdPoint = null;
+
+const todayISO = () => {
+  const d = new Date();
+  return [
+    d.getFullYear(),
+    String(d.getMonth()+1).padStart(2,'0'),
+    String(d.getDate()).padStart(2,'0')
+  ].join('-');
+};
+
+const monthStart = () => todayISO().slice(0,7) + '-01';
+
+const dateOnly = value =>
+  value ? String(value).slice(0,10) : '';
+
+const esc = value =>
+  String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  })[char]);
+
+function say(id, message) {
+  $(id).textContent = message;
+}
+
+function showModal(html) {
+  $('modalBody').innerHTML = html;
+  $('modal').classList.remove('hidden');
+}
+
+function closeModal() {
+  $('modal').classList.add('hidden');
+}
+
+$('closeModal').onclick = closeModal;
+
+function isAdmin() {
+  return profile?.role === 'admin';
+}
+
+function openPage(page) {
+  if (page === 'admin' && !isAdmin()) return;
+
+  ['map','customers','visits','payments','reminders','admin'].forEach(name => {
+    $('page-'+name).classList.toggle('hidden', name !== page);
+  });
+
+  document.querySelectorAll('.bottom button').forEach(button => {
+    button.classList.toggle('active', button.dataset.page === page);
+  });
+
+  if (page === 'map' && map) {
+    setTimeout(() => map.resize(), 100);
+  }
+}
+
+document.querySelectorAll('.bottom button[data-page]').forEach(button => {
+  button.onclick = () => openPage(button.dataset.page);
+});
+
+/* -------------------------------------------------------
+   ESTADOS DE CLIENTES Y MENSUALIDADES
+------------------------------------------------------- */
+
+function firstDue(customer) {
+  if (!customer.installation_date) return null;
+
+  const installation = new Date(customer.installation_date + 'T12:00:00');
+  let year = installation.getFullYear();
+  let month = installation.getMonth();
+
+  // Del 1 al 15: primer pago el siguiente mes.
+  // Del 16 al final: primer pago el mes posterior.
+  if (installation.getDate() > 15) month++;
+
+  return new Date(year, month + 1, 1);
+}
+
+function customerStatus(customer) {
+  const due = firstDue(customer);
+  const today = new Date();
+
+  if (due && today >= due) {
+    return {
+      text:'Primera mensualidad pendiente',
+      emoji:'🔴',
+      cls:'red'
+    };
+  }
+
+  if (due) {
+    return {
+      text:'Primera mensualidad aún no vence',
+      emoji:'🔵',
+      cls:'blue'
+    };
+  }
+
+  const paid = payments.some(payment =>
+    payment.customer_id === customer.id &&
+    dateOnly(payment.billing_month) === monthStart()
+  );
+
+  if (paid) {
+    return {
+      text:'Pagado este mes',
+      emoji:paidEmoji,
+      cls:'green'
+    };
+  }
+
+  const visited = visits.some(visit =>
+    visit.customer_id === customer.id &&
+    dateOnly(visit.visited_at || visit.created_at) >= monthStart()
+  );
+
+  if (visited) {
+    return {
+      text:'Visitado, falta pago',
+      emoji:'⭐',
+      cls:'yellow'
+    };
+  }
+
+  return {
+    text:'Sin visita este mes',
+    emoji:'📍',
+    cls:'blue'
+  };
+}
+
+function markerColor(customer) {
+  const status = customerStatus(customer);
+
+  if (status.cls === 'red') return '#ff5964';
+  if (status.cls === 'green') return '#21c58b';
+  if (status.cls === 'yellow') return '#ffbf47';
+  if (firstDue(customer)) return '#2684ff';
+
+  return '#9bb2ca';
+}
+
+/* -------------------------------------------------------
+   MAPA
+------------------------------------------------------- */
+
+function initMap() {
+  if (map) return;
+
+  map = new maplibregl.Map({
+    container:'map',
+    style:{
+      version:8,
+      sources:{
+        osm:{
+          type:'raster',
+          tiles:[
+            'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+          ],
+          tileSize:256,
+          attribution:'© OpenStreetMap contributors'
+        }
+      },
+      layers:[
+        {
+          id:'osm',
+          type:'raster',
+          source:'osm'
+        }
+      ]
+    },
+    center:[-90.5069,15.7835],
+    zoom:7
+  });
+
+  map.addControl(new maplibregl.NavigationControl(),'top-right');
+
+  map.on('load', renderMarkers);
+
+  // Mantener presionado para agregar una ubicación.
+  map.on('mousedown', event => {
+    holdPoint = event.lngLat;
+    clearTimeout(holdTimer);
+    holdTimer = setTimeout(() => {
+      if (holdPoint) offerAdd(holdPoint);
+    },650);
+  });
+
+  map.on('mouseup', () => {
+    clearTimeout(holdTimer);
+    holdPoint = null;
+  });
+
+  map.on('dragstart', () => {
+    clearTimeout(holdTimer);
+    holdPoint = null;
+  });
+
+  map.on('touchstart', event => {
+    if (!event.lngLat) return;
+
+    holdPoint = event.lngLat;
+    clearTimeout(holdTimer);
+
+    holdTimer = setTimeout(() => {
+      if (holdPoint) offerAdd(holdPoint);
+    },700);
+  });
+
+  map.on('touchend', () => {
+    clearTimeout(holdTimer);
+    holdPoint = null;
+  });
+
+  map.on('error', () => {
+    say('mapCount','Error de mapa');
+  });
+}
+
+function renderMarkers() {
+  if (!map || !map.loaded()) return;
+
+  markers.forEach(marker => marker.remove());
+  markers = [];
+
+  customers.forEach(customer => {
+    const lat = Number(customer.latitude);
+    const lon = Number(customer.longitude);
+
+    if (
+      !Number.isFinite(lat) ||
+      !Number.isFinite(lon) ||
+      lat < -90 || lat > 90 ||
+      lon < -180 || lon > 180
+    ) return;
+
+    const element = document.createElement('div');
+    element.className = 'marker';
+    element.style.background = markerColor(customer);
+
+    const popupContent = document.createElement('div');
+
+    const title = document.createElement('b');
+    title.textContent = customer.full_name || 'Cliente';
+    popupContent.appendChild(title);
+
+    const status = document.createElement('p');
+    const currentStatus = customerStatus(customer);
+    status.textContent = currentStatus.emoji + ' ' + currentStatus.text;
+    popupContent.appendChild(status);
+
+    const button = document.createElement('button');
+    button.textContent = 'Abrir ficha';
+    button.onclick = () => customerProfile(customer.id);
+    popupContent.appendChild(button);
+
+    const marker = new maplibregl.Marker(element)
+      .setLngLat([lon,lat])
+      .setPopup(
+        new maplibregl.Popup({offset:15}).setDOMContent(popupContent)
+      )
+      .addTo(map);
+
+    markers.push(marker);
+  });
+
+  $('mapCount').textContent = customers.length + ' clientes';
+}
+
+function offerAdd(location) {
+  const lat = Number(location.lat).toFixed(7);
+  const lon = Number(location.lng).toFixed(7);
+
+  showModal(`
+    <h2>Agregar ubicación</h2>
+    <p class="muted">Selecciona el tipo de cliente.</p>
+    <div class="actions">
+      <button onclick="customerForm(null,'new_installation',${lat},${lon})">
+        ＋ Nueva instalación
+      </button>
+      <button class="secondary" onclick="customerForm(null,'existing',${lat},${lon})">
+        Cliente existente
+      </button>
+    </div>
+  `);
+}
+
+/* -------------------------------------------------------
+   CARGA DE INFORMACIÓN
+------------------------------------------------------- */
+
+async function loadAll() {
+  say('mapCount','Cargando…');
+
+  const results = await Promise.all([
+    sb.from('customers')
+      .select('*')
+      .order('created_at',{ascending:false}),
+
+    sb.from('visits')
+      .select('*')
+      .order('created_at',{ascending:false})
+      .limit(200),
+
+    sb.from('payments')
+      .select('*')
+      .order('created_at',{ascending:false})
+      .limit(200),
+
+    sb.from('reminders')
+      .select('*')
+      .order('created_at',{ascending:false})
+      .limit(200)
+  ]);
+
+  const customerResult = results[0];
+
+  if (customerResult.error) {
+    throw customerResult.error;
+  }
+
+  customers = customerResult.data || [];
+  visits = results[1].data || [];
+  payments = results[2].data || [];
+  reminders = results[3].data || [];
+
+  const userResult = await sb.auth.getUser();
+  const user = userResult.data?.user;
+
+  if (user) {
+    const profileResult = await sb
+      .from('profiles')
+      .select('*')
+      .eq('id',user.id)
+      .maybeSingle();
+
+    profile = profileResult.data || null;
+  }
+
+  $('welcome').textContent =
+    profile?.display_name || 'Panel de trabajo';
+
+  $('adminNav').classList.toggle('hidden',!isAdmin());
+
+  $('nCustomers').textContent = customers.length;
+
+  $('nVisits').textContent = visits.filter(visit =>
+    dateOnly(visit.visited_at || visit.created_at) >= monthStart()
+  ).length;
+
+  $('nPaid').textContent = payments.filter(payment =>
+    dateOnly(payment.billing_month) === monthStart()
+  ).length;
+
+  $('nDue').textContent = customers.filter(customer => {
+    const status = customerStatus(customer);
+    return status.cls === 'red' || status.cls === 'yellow';
+  }).length;
+
+  $('paidEmoji').value = paidEmoji;
+
+  renderMarkers();
+  renderLists();
+}
+
+function nameOf(customerId) {
+  return customers.find(customer => customer.id === customerId)?.full_name
+    || 'Cliente';
+}
+
+/* -------------------------------------------------------
+   LISTAS
+------------------------------------------------------- */
+
+function renderLists() {
+  const query = ($('searchCustomers').value || '').toLowerCase();
+
+  const filtered = customers.filter(customer =>
+    (customer.full_name || '').toLowerCase().includes(query) ||
+    (customer.phone || '').includes(query)
+  );
+
+  $('customerList').innerHTML = filtered.map(customer => {
+    const status = customerStatus(customer);
+
+    return `
+      <article class="customer">
+        <div class="row">
+          <div>
+            <h3>${esc(customer.full_name)}</h3>
+            <div class="muted small">
+              ${esc(customer.phone || 'Sin teléfono')} ·
+              ${esc(customer.service_type || 'Servicio no indicado')}
+            </div>
+          </div>
+          <span class="pill ${status.cls}">${esc(status.emoji)}</span>
+        </div>
+
+        <div class="muted small">${esc(status.text)}</div>
+
+        <div class="actions">
+          <button onclick="customerProfile('${customer.id}')">Ver ficha</button>
           <button class="secondary" onclick="navigateowLogin();
       }
     });
