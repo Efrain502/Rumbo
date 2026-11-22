@@ -1,555 +1,430 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0b1424">
-<title>Rumbo | Tu mapa de trabajo</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101827">
+  <title>Rumbo | Tu mapa de trabajo</title>
 
-<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+  <!-- MapLibre -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css"
+    rel="stylesheet"
+  >
 
-<style>
-:root {
-  --bg:#0b1424;
-  --panel:#121f33;
-  --line:#2b3c55;
-  --text:#f4f7fb;
-  --muted:#9bacc2;
-  --blue:#2684ff;
-  --cyan:#39d5e8;
-  --green:#21c58b;
-  --red:#ff5964;
-  --yellow:#ffbf47;
-}
+  <style>
+    * { box-sizing: border-box; }
 
-* { box-sizing:border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #101827;
+      color: #f8fafc;
+    }
 
-body {
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font:15px system-ui,-apple-system,Segoe UI,Roboto,Arial;
-}
+    header {
+      padding: 16px;
+      background: #172337;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-button,input,select,textarea { font:inherit; }
+    header h1 { margin: 0; font-size: 25px; }
+    header p { margin: 4px 0 0; color: #9caec4; font-size: 12px; }
 
-button {
-  border:0;
-  border-radius:12px;
-  padding:12px 15px;
-  background:var(--blue);
-  color:white;
-  font-weight:700;
-  cursor:pointer;
-}
+    .status {
+      color: #4ade80;
+      font-size: 12px;
+    }
 
-button.secondary { background:#293b55; }
-button.danger { background:#9f2938; }
-button:disabled { opacity:.5; cursor:not-allowed; }
+    main { padding: 16px; }
 
-input,select,textarea {
-  width:100%;
-  padding:12px;
-  border:1px solid var(--line);
-  border-radius:10px;
-  background:#0e1a2c;
-  color:var(--text);
-  margin-top:6px;
-}
+    #login {
+      max-width: 420px;
+      margin: 45px auto;
+      padding: 22px;
+      background: #172337;
+      border-radius: 14px;
+    }
 
-textarea { min-height:100px; resize:vertical; }
+    #login h2 { margin-top: 0; }
 
-label {
-  display:block;
-  color:var(--muted);
-  font-size:13px;
-  margin:10px 0;
-}
+    input {
+      width: 100%;
+      padding: 14px;
+      margin: 8px 0;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      background: #243449;
+      color: white;
+      font-size: 16px;
+    }
 
-.hidden { display:none!important; }
-.muted { color:var(--muted); }
-.small { font-size:12px; }
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 13px 16px;
+      background: #2563eb;
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-.top {
-  height:64px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 16px;
-  background:#101d30;
-  border-bottom:1px solid var(--line);
-  position:sticky;
-  top:0;
-  z-index:5;
-}
+    button.secondary { background: #334155; }
 
-.brand {
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-weight:900;
-  font-size:22px;
-  letter-spacing:.5px;
-}
+    #login button { width: 100%; margin-top: 10px; }
 
-.logo {
-  width:36px;
-  height:36px;
-  border-radius:12px;
-  background:linear-gradient(140deg,var(--cyan),var(--blue));
-  display:grid;
-  place-items:center;
-  font-size:22px;
-}
+    #loginMessage {
+      color: #fca5a5;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
 
-.wrap {
-  max-width:1200px;
-  margin:auto;
-  padding:14px 14px 100px;
-}
+    #workspace { display: none; }
 
-.login {
-  max-width:420px;
-  margin:8vh auto;
-  background:var(--panel);
-  padding:24px;
-  border:1px solid var(--line);
-  border-radius:20px;
-}
+    #map {
+      height: 68vh;
+      min-height: 350px;
+      width: 100%;
+      border-radius: 13px;
+      overflow: hidden;
+      background: #243449;
+    }
 
-.login h1 { margin:8px 0; }
-.login button { width:100%; margin-top:12px; }
+    .map-actions {
+      display: flex;
+      gap: 10px;
+      margin: 12px 0;
+      flex-wrap: wrap;
+    }
 
-.bar {
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin:12px 0;
-}
+    #mapMessage {
+      color: #cbd5e1;
+      font-size: 13px;
+      margin: 10px 0;
+    }
 
-.bar button { flex:1; min-width:110px; }
+    .customer-marker {
+      width: 18px;
+      height: 18px;
+      border: 3px solid white;
+      border-radius: 50%;
+      background: #2563eb;
+      box-shadow: 0 1px 6px #0008;
+    }
 
-.stats {
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
-}
+    .maplibregl-popup-content {
+      color: #172337;
+      border-radius: 9px;
+      font-size: 14px;
+    }
 
-.stat,.card {
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:14px;
-}
-
-.stat b {
-  display:block;
-  font-size:25px;
-  margin-top:4px;
-}
-
-.section-title {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin:20px 0 10px;
-}
-
-.section-title h2 { font-size:19px; margin:0; }
-
-.mapbox {
-  height:57vh;
-  min-height:360px;
-  border-radius:16px;
-  overflow:hidden;
-  border:1px solid var(--line);
-}
-
-#map { height:100%; width:100%; }
-
-.bottom {
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  background:#101d30;
-  border-top:1px solid var(--line);
-  display:flex;
-  justify-content:space-around;
-  padding:8px 4px calc(8px + env(safe-area-inset-bottom));
-  z-index:10;
-}
-
-.bottom button {
-  background:transparent;
-  color:var(--muted);
-  padding:7px 9px;
-  font-size:11px;
-  min-width:0;
-}
-
-.bottom button.active { color:var(--cyan); }
-.bottom span { display:block; font-size:19px; }
-
-.list { display:grid; gap:9px; }
-
-.row {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-}
-
-.customer {
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:13px;
-}
-
-.customer h3 { margin:0 0 4px; font-size:16px; }
-
-.pill {
-  display:inline-block;
-  border-radius:20px;
-  padding:4px 9px;
-  font-size:11px;
-  font-weight:800;
-  background:#263b57;
-  color:#dceaff;
-}
-
-.pill.green { background:#123d35; color:#7af0c6; }
-.pill.red { background:#4b202a; color:#ffabb2; }
-.pill.yellow { background:#4b3a1b; color:#ffd783; }
-.pill.blue { background:#173d66; color:#a8d5ff; }
-
-.actions {
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:12px;
-}
-
-.actions button { flex:1; }
-
-.modal {
-  position:fixed;
-  inset:0;
-  background:#000a;
-  z-index:20;
-  display:flex;
-  align-items:flex-end;
-  justify-content:center;
-  padding:12px;
-}
-
-.sheet {
-  width:min(650px,100%);
-  max-height:90vh;
-  overflow:auto;
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:20px;
-  padding:18px;
-}
-
-.sheet h2 { margin:0 0 12px; }
-.close { float:right; background:#293b55; }
-
-.notice {
-  padding:11px;
-  border-radius:10px;
-  background:#172b44;
-  color:#c5d8ee;
-  margin:10px 0;
-}
-
-.marker {
-  width:23px;
-  height:23px;
-  border:2px solid white;
-  border-radius:50%;
-  box-shadow:0 2px 8px #0009;
-}
-
-.empty {
-  text-align:center;
-  padding:30px;
-  color:var(--muted);
-}
-
-.error { color:#ff9da5; }
-.success { color:#7af0c6; }
-
-@media(max-width:650px) {
-  .stats { grid-template-columns:repeat(2,1fr); }
-  .mapbox { height:55vh; }
-  .wrap { padding-left:11px; padding-right:11px; }
-  .top { height:58px; }
-  .bottom button { font-size:10px; padding:6px 4px; }
-}
-</style>
+    footer {
+      text-align: center;
+      padding: 18px;
+      color: #94a3b8;
+      font-size: 12px;
+    }
+  </style>
 </head>
 
 <body>
-
-<header class="top">
-  <div class="brand">
-    <div class="logo">➤</div>
-    RUMBO
-  </div>
-  <div class="small muted">Encuentra · Visita · Registra</div>
-</header>
-
-<main class="wrap">
-
-<!-- LOGIN -->
-
-<section id="login" class="login">
-  <div class="logo">➤</div>
-  <h1>Bienvenido a Rumbo</h1>
-  <p class="muted">Tu mapa de trabajo.</p>
-
-  <form id="loginForm">
-
-    <label>Correo electrónico
-      <input
-        id="email"
-        type="email"
-        autocomplete="username"
-        required
-      >
-    </label>
-
-    <label>Contraseña
-      <input
-        id="password"
-        type="password"
-        autocomplete="current-password"
-        required
-      >
-    </label>
-
-    <button id="loginBtn" type="submit">Entrar</button>
-
-  </form>
-
-  <p id="loginMsg" class="small" role="status"></p>
-</section>
-
-
-<!-- APPLICATION -->
-
-<section id="app" class="hidden">
-
-  <div class="row">
+  <header>
     <div>
-      <div class="muted small" id="welcome">Panel de trabajo</div>
-      <h2 style="margin:3px 0">Resumen</h2>
+      <h1>Rumbo</h1>
+      <p>Encuentra. Visita. Registra.</p>
     </div>
+    <span class="status">● Rumbo</span>
+  </header>
 
-    <button class="secondary" id="logout">Salir</button>
-  </div>
+  <main>
+    <section id="login">
+      <h2>Iniciar sesión</h2>
+      <p>Ingresa con tu cuenta de Rumbo.</p>
 
-  <div class="stats">
+      <form id="loginForm">
+        <input
+          id="email"
+          type="email"
+          placeholder="Correo electrónico"
+          autocomplete="username"
+          required
+        >
 
-    <div class="stat">
-      <span class="muted small">Clientes</span>
-      <b id="nCustomers">0</b>
-    </div>
+        <input
+          id="password"
+          type="password"
+          placeholder="Contraseña"
+          autocomplete="current-password"
+          required
+        >
 
-    <div class="stat">
-      <span class="muted small">Visitados este mes</span>
-      <b id="nVisits">0</b>
-    </div>
+        <button type="submit" id="loginButton">
+          Entrar a Rumbo
+        </button>
+      </form>
 
-    <div class="stat">
-      <span class="muted small">Pagados este mes</span>
-      <b id="nPaid">0</b>
-    </div>
+      <p id="loginMessage"></p>
+    </section>
 
-    <div class="stat">
-      <span class="muted small">Pendientes</span>
-      <b id="nDue">0</b>
-    </div>
+    <section id="workspace">
+      <div class="map-actions">
+        <button id="gpsButton">Mi ubicación</button>
+        <button id="logoutButton" class="secondary">Cerrar sesión</button>
+      </div>
 
-  </div>
-
-
-  <!-- MAP -->
-
-  <section id="page-map">
-
-    <div class="section-title">
-      <h2>Mapa de clientes</h2>
-      <span class="pill blue" id="mapCount">Cargando…</span>
-    </div>
-
-    <div class="bar">
-      <button id="gps">◎ Mi ubicación</button>
-      <button class="secondary" id="refresh">↻ Actualizar</button>
-    </div>
-
-    <div class="mapbox">
       <div id="map"></div>
-    </div>
+      <p id="mapMessage">Preparando el mapa...</p>
+    </section>
+  </main>
 
-    <p class="muted small">
-      Mantén presionado el mapa para agregar un cliente.
-      Toca un marcador para abrir su ficha.
-    </p>
+  <footer>Rumbo · Tu mapa de trabajo</footer>
 
-    <div class="notice small">
-      📍 Sin visita este mes · ⭐ Visitado, falta pago ·
-      💰 Pagado · 🔵 Primera mensualidad aún no vence ·
-      🔴 Primera mensualidad pendiente
-    </div>
+  <!-- Libraries and project configuration -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="./config.js"></script>
 
-  </section>
+  <script>
+    const supabaseClient = window.supabase.createClient(
+      window.RUMBO_CONFIG.supabaseUrl,
+      window.RUMBO_CONFIG.supabaseKey
+    );
 
+    let map = null;
+    let mapInitialized = false;
+    let customerMarkers = [];
 
-  <!-- CUSTOMERS -->
+    const loginSection = document.getElementById("login");
+    const workspace = document.getElementById("workspace");
+    const loginMessage = document.getElementById("loginMessage");
+    const mapMessage = document.getElementById("mapMessage");
 
-  <section id="page-customers" class="hidden">
+    function showWorkspace() {
+      loginSection.style.display = "none";
+      workspace.style.display = "block";
 
-    <div class="section-title">
-      <h2>Clientes</h2>
-      <button id="addCustomer">＋ Agregar</button>
-    </div>
+      if (!mapInitialized) {
+        initializeMap();
+      } else {
+        setTimeout(() => map.resize(), 100);
+      }
+    }
 
-    <input
-      id="searchCustomers"
-      placeholder="Buscar por nombre o teléfono…"
-    >
+    function showLogin() {
+      workspace.style.display = "none";
+      loginSection.style.display = "block";
+    }
 
-    <div
-      id="customerList"
-      class="list"
-      style="margin-top:10px"
-    ></div>
+    async function initializeMap() {
+      mapInitialized = true;
 
-  </section>
+      map = new maplibregl.Map({
+        container: "map",
+        style: {
+          version: 8,
+          sources: {
+            osm: {
+              type: "raster",
+              tiles: [
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+              ],
+              tileSize: 256,
+              attribution: "© OpenStreetMap contributors"
+            }
+          },
+          layers: [
+            {
+              id: "osm-layer",
+              type: "raster",
+              source: "osm"
+            }
+          ]
+        },
+        center: [-90.5069, 15.7835],
+        zoom: 7
+      });
 
+      map.addControl(
+        new maplibregl.NavigationControl(),
+        "top-right"
+      );
 
-  <!-- VISITS -->
+      map.on("load", loadCustomers);
 
-  <section id="page-visits" class="hidden">
-    <div class="section-title">
-      <h2>Visitas</h2>
-    </div>
-    <div id="visitList" class="list"></div>
-  </section>
+      map.on("error", () => {
+        mapMessage.textContent =
+          "No se pudo cargar una parte del mapa. Revisa tu conexión.";
+      });
+    }
 
+    async function loadCustomers() {
+      mapMessage.textContent = "Cargando clientes...";
 
-  <!-- PAYMENTS -->
+      const { data, error } = await supabaseClient
+        .from("customers")
+        .select(
+          "id, full_name, latitude, longitude, customer_type, service_type, monthly_amount"
+        );
 
-  <section id="page-payments" class="hidden">
-    <div class="section-title">
-      <h2>Pagos</h2>
-    </div>
-    <div id="paymentList" class="list"></div>
-  </section>
+      if (error) {
+        mapMessage.textContent =
+          "No se pudieron cargar los clientes: " + error.message;
+        return;
+      }
 
+      customerMarkers.forEach(marker => marker.remove());
+      customerMarkers = [];
 
-  <!-- REMINDERS -->
+      let validCount = 0;
 
-  <section id="page-reminders" class="hidden">
+      (data || []).forEach(customer => {
+        const lat = Number(customer.latitude);
+        const lon = Number(customer.longitude);
 
-    <div class="section-title">
-      <h2>Recordatorios</h2>
-      <button id="addReminder">＋ Nuevo</button>
-    </div>
+        if (
+          !Number.isFinite(lat) ||
+          !Number.isFinite(lon) ||
+          lat < -90 || lat > 90 ||
+          lon < -180 || lon > 180
+        ) {
+          return;
+        }
 
-    <div id="reminderList" class="list"></div>
+        const markerElement = document.createElement("div");
+        markerElement.className = "customer-marker";
 
-  </section>
+        const popupContent = document.createElement("div");
 
+        const name = document.createElement("strong");
+        name.textContent = customer.full_name || "Cliente";
+        popupContent.appendChild(name);
 
-  <!-- ADMIN -->
+        const service = document.createElement("p");
+        service.textContent =
+          "Servicio: " + (customer.service_type || "No especificado");
+        popupContent.appendChild(service);
 
-  <section id="page-admin" class="hidden">
+        const type = document.createElement("p");
+        type.textContent =
+          "Tipo: " + (customer.customer_type || "No especificado");
+        popupContent.appendChild(type);
 
-    <div class="section-title">
-      <h2>Administración</h2>
-    </div>
+        const popup = new maplibregl.Popup({ offset: 15 })
+          .setDOMContent(popupContent);
 
-    <div class="card">
+        const marker = new maplibregl.Marker({
+          element: markerElement
+        })
+          .setLngLat([lon, lat])
+          .setPopup(popup)
+          .addTo(map);
 
-      <p class="muted small">
-        Importar clientes existentes.
-        Una línea por cliente:
-        nombre, latitud, longitud.
-      </p>
+        customerMarkers.push(marker);
+        validCount++;
+      });
 
-      <label>Lista de clientes
-        <textarea
-          id="importText"
-          placeholder="Nombre del cliente, 15.123456, -91.123456"
-        ></textarea>
-      </label>
+      mapMessage.textContent =
+        validCount + " clientes cargados en el mapa.";
+    }
 
-      <button id="previewImport">Revisar e importar</button>
+    document.getElementById("loginForm").addEventListener(
+      "submit",
+      async event => {
+        event.preventDefault();
 
-      <p id="importMsg" class="small"></p>
+        loginMessage.textContent = "Iniciando sesión...";
 
-    </div>
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
 
-    <div class="card" style="margin-top:12px">
+        const { error } = await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
 
-      <label>Emoji de pago mensual
-        <input id="paidEmoji" maxlength="5" value="💰">
-      </label>
+        if (error) {
+          loginMessage.textContent =
+            "No se pudo iniciar sesión: " + error.message;
+          return;
+        }
 
-      <button id="saveSettings">Guardar emoji</button>
+        loginMessage.textContent = "";
+        showWorkspace();
+      }
+    );
 
-      <p class="muted small">
-        El emoji se guarda en este dispositivo.
-      </p>
+    document.getElementById("logoutButton").addEventListener(
+      "click",
+      async () => {
+        await supabaseClient.auth.signOut();
+        showLogin();
+      }
+    );
 
-    </div>
+    document.getElementById("gpsButton").addEventListener(
+      "click",
+      () => {
+        if (!navigator.geolocation) {
+          mapMessage.textContent =
+            "Este navegador no permite obtener la ubicación.";
+          return;
+        }
 
-  </section>
+        mapMessage.textContent = "Buscando tu ubicación...";
 
-</section>
-</main>
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
 
+            map.flyTo({
+              center: [lon, lat],
+              zoom: 16
+            });
 
-<!-- BOTTOM NAVIGATION -->
+            mapMessage.textContent =
+              "Tu ubicación: " + lat.toFixed(6) + ", " +
+              lon.toFixed(6);
+          },
+          error => {
+            mapMessage.textContent =
+              "No se pudo obtener la ubicación. Revisa los permisos GPS.";
+          },
+          { enableHighAccuracy: true, timeout: 15000 }
+        );
+      }
+    );
 
-<nav id="nav" class="bottom hidden">
+    async function checkSession() {
+      const { data, error } = await supabaseClient.auth.getSession();
 
-  <button data-page="map" class="active">
-    <span>🗺️</span>Mapa
-  </button>
+      if (error) {
+        loginMessage.textContent = error.message;
+        showLogin();
+        return;
+      }
 
-  <button data-page="customers">
-    <span>👥</span>Clientes
-  </button>
+      if (data.session) {
+        showWorkspace();
+      } else {
+        showLogin();
+      }
+    }
 
-  <button data-page="visits">
-    <span>🚶</span>Visitas
-  </button>
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") {
+        showLogin();
+      }
+    });
 
-  <button data-page="payments">
-    <span>💵</span>Pagos
-  </button>
-
-  <button data-page="reminders">
-    <span>⏰</span>Avisos
-  </button>
-
-  <button data-page="admin" id="adminNav">
-    <span>⚙️</span>Admin
-  </button>
-
-</nav>
-
-
-<!-- MODAL -->
-
-<div id="modal" class="modal hidden">
+    checkSession();
+  </script>
+</body>
+</html>al" class="modal hidden">
 
   <div class="sheet">
 
