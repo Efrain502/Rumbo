@@ -12,7 +12,6 @@
 :root {
   --bg:#0b1424;
   --panel:#121f33;
-  --panel2:#1a2a42;
   --line:#2b3c55;
   --text:#f4f7fb;
   --muted:#9bacc2;
@@ -22,68 +21,274 @@
   --red:#ff5964;
   --yellow:#ffbf47;
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,Roboto,Arial}
-button,input,select,textarea{font:inherit}
-button{border:0;border-radius:12px;padding:12px 15px;background:var(--blue);color:white;font-weight:700;cursor:pointer}
-button.secondary{background:#293b55}
-button.danger{background:#9f2938}
-button.ghost{background:transparent;border:1px solid var(--line)}
-button:disabled{opacity:.5;cursor:not-allowed}
-input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#0e1a2c;color:var(--text);margin-top:6px}
-textarea{min-height:100px;resize:vertical}
-label{display:block;color:var(--muted);font-size:13px;margin:10px 0}
-.hidden{display:none!important}
-.muted{color:var(--muted)}
-.small{font-size:12px}
-.top{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:#101d30;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
-.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:22px;letter-spacing:.5px}
-.logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(140deg,var(--cyan),var(--blue));display:grid;place-items:center;font-size:22px}
-.wrap{max-width:1200px;margin:auto;padding:14px 14px 100px}
-.login{max-width:420px;margin:8vh auto;background:var(--panel);padding:24px;border:1px solid var(--line);border-radius:20px}
-.login h1{margin:8px 0}
-.login button{width:100%;margin-top:12px}
-.bar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-.bar button{flex:1;min-width:110px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.stat,.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px}
-.stat b{display:block;font-size:25px;margin-top:4px}
-.section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:20px 0 10px}
-.section-title h2{font-size:19px;margin:0}
-.mapbox{height:57vh;min-height:360px;border-radius:16px;overflow:hidden;border:1px solid var(--line)}
-#map{height:100%;width:100%}
-.bottom{position:fixed;bottom:0;left:0;right:0;background:#101d30;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:10}
-.bottom button{background:transparent;color:var(--muted);padding:7px 9px;font-size:11px;min-width:0}
-.bottom button.active{color:var(--cyan)}
-.bottom span{display:block;font-size:19px}
-.list{display:grid;gap:9px}
-.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.customer{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px}
-.customer h3{margin:0 0 4px;font-size:16px}
-.pill{display:inline-block;border-radius:20px;padding:4px 9px;font-size:11px;font-weight:800;background:#263b57;color:#dceaff}
-.pill.green{background:#123d35;color:#7af0c6}
-.pill.red{background:#4b202a;color:#ffabb2}
-.pill.yellow{background:#4b3a1b;color:#ffd783}
-.pill.blue{background:#173d66;color:#a8d5ff}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.actions button{flex:1}
-.modal{position:fixed;inset:0;background:#000a;z-index:20;display:flex;align-items:flex-end;justify-content:center;padding:12px}
-.sheet{width:min(650px,100%);max-height:90vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px}
-.sheet h2{margin:0 0 12px}
-.close{float:right;background:#293b55}
-.notice{padding:11px;border-radius:10px;background:#172b44;color:#c5d8ee;margin:10px 0}
-.marker{width:23px;height:23px;border:2px solid white;border-radius:50%;box-shadow:0 2px 8px #0009}
-.empty{text-align:center;padding:30px;color:var(--muted)}
-.table{width:100%;border-collapse:collapse}
-.table td,.table th{padding:9px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}
-@media(max-width:650px){
- .stats{grid-template-columns:repeat(2,1fr)}
- .grid2{grid-template-columns:1fr}
- .mapbox{height:55vh}
- .wrap{padding-left:11px;padding-right:11px}
- .top{height:58px}
- .bottom button{font-size:10px;padding:6px 4px}
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font:15px system-ui,-apple-system,Segoe UI,Roboto,Arial;
+}
+
+button,input,select,textarea { font:inherit; }
+
+button {
+  border:0;
+  border-radius:12px;
+  padding:12px 15px;
+  background:var(--blue);
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+}
+
+button.secondary { background:#293b55; }
+button.danger { background:#9f2938; }
+button:disabled { opacity:.5; cursor:not-allowed; }
+
+input,select,textarea {
+  width:100%;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#0e1a2c;
+  color:var(--text);
+  margin-top:6px;
+}
+
+textarea { min-height:100px; resize:vertical; }
+
+label {
+  display:block;
+  color:var(--muted);
+  font-size:13px;
+  margin:10px 0;
+}
+
+.hidden { display:none!important; }
+.muted { color:var(--muted); }
+.small { font-size:12px; }
+
+.top {
+  height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 16px;
+  background:#101d30;
+  border-bottom:1px solid var(--line);
+  position:sticky;
+  top:0;
+  z-index:5;
+}
+
+.brand {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:900;
+  font-size:22px;
+  letter-spacing:.5px;
+}
+
+.logo {
+  width:36px;
+  height:36px;
+  border-radius:12px;
+  background:linear-gradient(140deg,var(--cyan),var(--blue));
+  display:grid;
+  place-items:center;
+  font-size:22px;
+}
+
+.wrap {
+  max-width:1200px;
+  margin:auto;
+  padding:14px 14px 100px;
+}
+
+.login {
+  max-width:420px;
+  margin:8vh auto;
+  background:var(--panel);
+  padding:24px;
+  border:1px solid var(--line);
+  border-radius:20px;
+}
+
+.login h1 { margin:8px 0; }
+.login button { width:100%; margin-top:12px; }
+
+.bar {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:12px 0;
+}
+
+.bar button { flex:1; min-width:110px; }
+
+.stats {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+
+.stat,.card {
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px;
+}
+
+.stat b {
+  display:block;
+  font-size:25px;
+  margin-top:4px;
+}
+
+.section-title {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:20px 0 10px;
+}
+
+.section-title h2 { font-size:19px; margin:0; }
+
+.mapbox {
+  height:57vh;
+  min-height:360px;
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid var(--line);
+}
+
+#map { height:100%; width:100%; }
+
+.bottom {
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#101d30;
+  border-top:1px solid var(--line);
+  display:flex;
+  justify-content:space-around;
+  padding:8px 4px calc(8px + env(safe-area-inset-bottom));
+  z-index:10;
+}
+
+.bottom button {
+  background:transparent;
+  color:var(--muted);
+  padding:7px 9px;
+  font-size:11px;
+  min-width:0;
+}
+
+.bottom button.active { color:var(--cyan); }
+.bottom span { display:block; font-size:19px; }
+
+.list { display:grid; gap:9px; }
+
+.row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
+.customer {
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:13px;
+}
+
+.customer h3 { margin:0 0 4px; font-size:16px; }
+
+.pill {
+  display:inline-block;
+  border-radius:20px;
+  padding:4px 9px;
+  font-size:11px;
+  font-weight:800;
+  background:#263b57;
+  color:#dceaff;
+}
+
+.pill.green { background:#123d35; color:#7af0c6; }
+.pill.red { background:#4b202a; color:#ffabb2; }
+.pill.yellow { background:#4b3a1b; color:#ffd783; }
+.pill.blue { background:#173d66; color:#a8d5ff; }
+
+.actions {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+
+.actions button { flex:1; }
+
+.modal {
+  position:fixed;
+  inset:0;
+  background:#000a;
+  z-index:20;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding:12px;
+}
+
+.sheet {
+  width:min(650px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:18px;
+}
+
+.sheet h2 { margin:0 0 12px; }
+.close { float:right; background:#293b55; }
+
+.notice {
+  padding:11px;
+  border-radius:10px;
+  background:#172b44;
+  color:#c5d8ee;
+  margin:10px 0;
+}
+
+.marker {
+  width:23px;
+  height:23px;
+  border:2px solid white;
+  border-radius:50%;
+  box-shadow:0 2px 8px #0009;
+}
+
+.empty {
+  text-align:center;
+  padding:30px;
+  color:var(--muted);
+}
+
+.error { color:#ff9da5; }
+.success { color:#7af0c6; }
+
+@media(max-width:650px) {
+  .stats { grid-template-columns:repeat(2,1fr); }
+  .mapbox { height:55vh; }
+  .wrap { padding-left:11px; padding-right:11px; }
+  .top { height:58px; }
+  .bottom button { font-size:10px; padding:6px 4px; }
 }
 </style>
 </head>
@@ -91,11 +296,16 @@ label{display:block;color:var(--muted);font-size:13px;margin:10px 0}
 <body>
 
 <header class="top">
-  <div class="brand"><div class="logo">➤</div>RUMBO</div>
+  <div class="brand">
+    <div class="logo">➤</div>
+    RUMBO
+  </div>
   <div class="small muted">Encuentra · Visita · Registra</div>
 </header>
 
 <main class="wrap">
+
+<!-- LOGIN -->
 
 <section id="login" class="login">
   <div class="logo">➤</div>
@@ -103,17 +313,34 @@ label{display:block;color:var(--muted);font-size:13px;margin:10px 0}
   <p class="muted">Tu mapa de trabajo.</p>
 
   <form id="loginForm">
+
     <label>Correo electrónico
-      <input id="email" type="email" autocomplete="username" required>
+      <input
+        id="email"
+        type="email"
+        autocomplete="username"
+        required
+      >
     </label>
+
     <label>Contraseña
-      <input id="password" type="password" autocomplete="current-password" required>
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password"
+        required
+      >
     </label>
-    <button id="loginBtn">Entrar</button>
+
+    <button id="loginBtn" type="submit">Entrar</button>
+
   </form>
 
-  <p id="loginMsg" class="small"></p>
+  <p id="loginMsg" class="small" role="status"></p>
 </section>
+
+
+<!-- APPLICATION -->
 
 <section id="app" class="hidden">
 
@@ -122,17 +349,39 @@ label{display:block;color:var(--muted);font-size:13px;margin:10px 0}
       <div class="muted small" id="welcome">Panel de trabajo</div>
       <h2 style="margin:3px 0">Resumen</h2>
     </div>
+
     <button class="secondary" id="logout">Salir</button>
   </div>
 
   <div class="stats">
-    <div class="stat"><span class="muted small">Clientes</span><b id="nCustomers">0</b></div>
-    <div class="stat"><span class="muted small">Visitados este mes</span><b id="nVisits">0</b></div>
-    <div class="stat"><span class="muted small">Pagados este mes</span><b id="nPaid">0</b></div>
-    <div class="stat"><span class="muted small">Pendientes</span><b id="nDue">0</b></div>
+
+    <div class="stat">
+      <span class="muted small">Clientes</span>
+      <b id="nCustomers">0</b>
+    </div>
+
+    <div class="stat">
+      <span class="muted small">Visitados este mes</span>
+      <b id="nVisits">0</b>
+    </div>
+
+    <div class="stat">
+      <span class="muted small">Pagados este mes</span>
+      <b id="nPaid">0</b>
+    </div>
+
+    <div class="stat">
+      <span class="muted small">Pendientes</span>
+      <b id="nDue">0</b>
+    </div>
+
   </div>
 
+
+  <!-- MAP -->
+
   <section id="page-map">
+
     <div class="section-title">
       <h2>Mapa de clientes</h2>
       <span class="pill blue" id="mapCount">Cargando…</span>
@@ -143,7 +392,9 @@ label{display:block;color:var(--muted);font-size:13px;margin:10px 0}
       <button class="secondary" id="refresh">↻ Actualizar</button>
     </div>
 
-    <div class="mapbox"><div id="map"></div></div>
+    <div class="mapbox">
+      <div id="map"></div>
+    </div>
 
     <p class="muted small">
       Mantén presionado el mapa para agregar un cliente.
@@ -151,98 +402,199 @@ label{display:block;color:var(--muted);font-size:13px;margin:10px 0}
     </p>
 
     <div class="notice small">
-      📍 Sin visita este mes · ⭐ Visitado, falta pago · 💰 Pagado ·
-      🔵 Primera mensualidad aún no vence · 🔴 Primera mensualidad pendiente
+      📍 Sin visita este mes · ⭐ Visitado, falta pago ·
+      💰 Pagado · 🔵 Primera mensualidad aún no vence ·
+      🔴 Primera mensualidad pendiente
     </div>
+
   </section>
 
+
+  <!-- CUSTOMERS -->
+
   <section id="page-customers" class="hidden">
+
     <div class="section-title">
       <h2>Clientes</h2>
       <button id="addCustomer">＋ Agregar</button>
     </div>
-    <input id="searchCustomers" placeholder="Buscar por nombre o teléfono…">
-    <div id="customerList" class="list" style="margin-top:10px"></div>
+
+    <input
+      id="searchCustomers"
+      placeholder="Buscar por nombre o teléfono…"
+    >
+
+    <div
+      id="customerList"
+      class="list"
+      style="margin-top:10px"
+    ></div>
+
   </section>
 
+
+  <!-- VISITS -->
+
   <section id="page-visits" class="hidden">
-    <div class="section-title"><h2>Visitas</h2></div>
+    <div class="section-title">
+      <h2>Visitas</h2>
+    </div>
     <div id="visitList" class="list"></div>
   </section>
 
+
+  <!-- PAYMENTS -->
+
   <section id="page-payments" class="hidden">
-    <div class="section-title"><h2>Pagos</h2></div>
+    <div class="section-title">
+      <h2>Pagos</h2>
+    </div>
     <div id="paymentList" class="list"></div>
   </section>
 
+
+  <!-- REMINDERS -->
+
   <section id="page-reminders" class="hidden">
+
     <div class="section-title">
       <h2>Recordatorios</h2>
       <button id="addReminder">＋ Nuevo</button>
     </div>
+
     <div id="reminderList" class="list"></div>
+
   </section>
 
+
+  <!-- ADMIN -->
+
   <section id="page-admin" class="hidden">
-    <div class="section-title"><h2>Administración</h2></div>
+
+    <div class="section-title">
+      <h2>Administración</h2>
+    </div>
 
     <div class="card">
+
       <p class="muted small">
-        Importar clientes existentes. Una línea por cliente:
+        Importar clientes existentes.
+        Una línea por cliente:
         nombre, latitud, longitud.
       </p>
+
       <label>Lista de clientes
-        <textarea id="importText" placeholder="Nombre del cliente, 15.123456, -91.123456"></textarea>
+        <textarea
+          id="importText"
+          placeholder="Nombre del cliente, 15.123456, -91.123456"
+        ></textarea>
       </label>
+
       <button id="previewImport">Revisar e importar</button>
+
       <p id="importMsg" class="small"></p>
+
     </div>
 
     <div class="card" style="margin-top:12px">
+
       <label>Emoji de pago mensual
         <input id="paidEmoji" maxlength="5" value="💰">
       </label>
+
       <button id="saveSettings">Guardar emoji</button>
-      <p class="muted small">El emoji se guarda en este dispositivo.</p>
+
+      <p class="muted small">
+        El emoji se guarda en este dispositivo.
+      </p>
+
     </div>
+
   </section>
 
 </section>
 </main>
 
+
+<!-- BOTTOM NAVIGATION -->
+
 <nav id="nav" class="bottom hidden">
-  <button data-page="map" class="active"><span>🗺️</span>Mapa</button>
-  <button data-page="customers"><span>👥</span>Clientes</button>
-  <button data-page="visits"><span>🚶</span>Visitas</button>
-  <button data-page="payments"><span>💵</span>Pagos</button>
-  <button data-page="reminders"><span>⏰</span>Avisos</button>
-  <button data-page="admin" id="adminNav"><span>⚙️</span>Admin</button>
+
+  <button data-page="map" class="active">
+    <span>🗺️</span>Mapa
+  </button>
+
+  <button data-page="customers">
+    <span>👥</span>Clientes
+  </button>
+
+  <button data-page="visits">
+    <span>🚶</span>Visitas
+  </button>
+
+  <button data-page="payments">
+    <span>💵</span>Pagos
+  </button>
+
+  <button data-page="reminders">
+    <span>⏰</span>Avisos
+  </button>
+
+  <button data-page="admin" id="adminNav">
+    <span>⚙️</span>Admin
+  </button>
+
 </nav>
 
+
+<!-- MODAL -->
+
 <div id="modal" class="modal hidden">
+
   <div class="sheet">
+
     <button class="close" id="closeModal">Cerrar ✕</button>
+
     <div id="modalBody"></div>
+
   </div>
+
 </div>
+
+
+<!-- LIBRARIES AND CONFIG -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script src="./config.js"></script>
 
+
 <script>
 'use strict';
 
-/* -------------------------------------------------------
-   CONFIGURACIÓN Y ESTADO
-------------------------------------------------------- */
+/* ======================================================
+   CONNECTION
+====================================================== */
 
-if (!window.RUMBO_CONFIG ||
-    !window.RUMBO_CONFIG.supabaseUrl ||
-    !window.RUMBO_CONFIG.supabaseKey) {
-  document.getElementById('loginMsg').textContent =
-    'Falta la configuración de Supabase. Revisa config.js.';
-  throw new Error('RUMBO_CONFIG no está disponible.');
+const $ = id => document.getElementById(id);
+
+const loginMessage = (message, type='') => {
+  $('loginMsg').textContent = message;
+  $('loginMsg').className = 'small ' + type;
+};
+
+if (
+  !window.RUMBO_CONFIG ||
+  !window.RUMBO_CONFIG.supabaseUrl ||
+  !window.RUMBO_CONFIG.supabaseKey ||
+  !window.supabase
+) {
+  loginMessage(
+    'No se pudo cargar la conexión. Revisa config.js e inténtalo de nuevo.',
+    'error'
+  );
+
+  throw new Error('Falta RUMBO_CONFIG o Supabase JS.');
 }
 
 const sb = window.supabase.createClient(
@@ -250,14 +602,520 @@ const sb = window.supabase.createClient(
   window.RUMBO_CONFIG.supabaseKey
 );
 
-const $ = id => document.getElementById(id);
+
+/* ======================================================
+   APPLICATION STATE
+====================================================== */
 
 let map = null;
 let markers = [];
+
 let customers = [];
 let visits = [];
 let payments = [];
 let reminders = [];
+
+let profile = null;
+
+let holdTimer = null;
+let holdPoint = null;
+let currentLocation = null;
+
+let paidEmoji =
+  localStorage.getItem('rumboPaidEmoji') || '💰';
+
+
+/* ======================================================
+   HELPERS
+====================================================== */
+
+function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  })[char]);
+}
+
+function todayISO() {
+  const d = new Date();
+
+  return [
+    d.getFullYear(),
+    String(d.getMonth()+1).padStart(2,'0'),
+    String(d.getDate()).padStart(2,'0')
+  ].join('-');
+}
+
+function monthStart() {
+  return todayISO().slice(0,7) + '-01';
+}
+
+function dateOnly(value) {
+  return value ? String(value).slice(0,10) : '';
+}
+
+function isAdmin() {
+  return profile?.role === 'admin';
+}
+
+function showModal(html) {
+  $('modalBody').innerHTML = html;
+  $('modal').classList.remove('hidden');
+}
+
+function closeModal() {
+  $('modal').classList.add('hidden');
+}
+
+$('closeModal').addEventListener('click',closeModal);
+
+
+/* ======================================================
+   NAVIGATION
+====================================================== */
+
+function openPage(page) {
+
+  if (page === 'admin' && !isAdmin()) {
+    return;
+  }
+
+  const pages = [
+    'map',
+    'customers',
+    'visits',
+    'payments',
+    'reminders',
+    'admin'
+  ];
+
+  pages.forEach(name => {
+    $('page-'+name).classList.toggle(
+      'hidden',
+      name !== page
+    );
+  });
+
+  document.querySelectorAll('.bottom button').forEach(button => {
+    button.classList.toggle(
+      'active',
+      button.dataset.page === page
+    );
+  });
+
+  if (page === 'map' && map) {
+    setTimeout(() => map.resize(),100);
+  }
+}
+
+document.querySelectorAll('.bottom button[data-page]')
+  .forEach(button => {
+    button.addEventListener('click',() => {
+      openPage(button.dataset.page);
+    });
+  });
+
+
+/* ======================================================
+   LOGIN AND SESSION
+====================================================== */
+
+function setSignedIn(signedIn) {
+
+  $('login').classList.toggle('hidden',signedIn);
+  $('app').classList.toggle('hidden',!signedIn);
+  $('nav').classList.toggle('hidden',!signedIn);
+
+  if (signedIn) {
+    openPage('map');
+
+    setTimeout(() => {
+      initMap();
+    },100);
+  }
+}
+
+async function signIn(event) {
+
+  event.preventDefault();
+
+  const email = $('email').value.trim();
+  const password = $('password').value;
+
+  const button = $('loginBtn');
+
+  button.disabled = true;
+  button.textContent = 'Ingresando…';
+
+  loginMessage('');
+
+  try {
+
+    const {data,error} = await sb.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    if (!data.user) {
+      throw new Error('No se recibió una sesión válida.');
+    }
+
+    await enterApp(data.user);
+
+  } catch (error) {
+
+    loginMessage(
+      error.message || 'No se pudo iniciar sesión.',
+      'error'
+    );
+
+  } finally {
+
+    button.disabled = false;
+    button.textContent = 'Entrar';
+
+  }
+}
+
+$('loginForm').addEventListener('submit',signIn);
+
+
+async function enterApp(user) {
+
+  try {
+
+    const {data,error} = await sb
+      .from('profiles')
+      .select('*')
+      .eq('id',user.id)
+      .maybeSingle();
+
+    if (error) {
+      throw error;
+    }
+
+    profile = data || null;
+
+    $('welcome').textContent =
+      profile?.display_name ||
+      user.email ||
+      'Panel de trabajo';
+
+    $('adminNav').classList.toggle(
+      'hidden',
+      !isAdmin()
+    );
+
+    $('paidEmoji').value = paidEmoji;
+
+    setSignedIn(true);
+
+    await loadAll();
+
+  } catch (error) {
+
+    loginMessage(
+      'No se pudo cargar tu perfil: ' + error.message,
+      'error'
+    );
+
+    await sb.auth.signOut();
+
+    profile = null;
+
+    setSignedIn(false);
+
+  }
+}
+
+
+async function checkSession() {
+
+  try {
+
+    const {data,error} = await sb.auth.getSession();
+
+    if (error) {
+      throw error;
+    }
+
+    if (data.session?.user) {
+      await enterApp(data.session.user);
+    }
+
+  } catch (error) {
+
+    loginMessage(
+      'Error al revisar la sesión: ' + error.message,
+      'error'
+    );
+
+  }
+}
+
+
+$('logout').addEventListener('click',async () => {
+
+  const {error} = await sb.auth.signOut();
+
+  if (error) {
+    alert('No se pudo cerrar sesión: ' + error.message);
+    return;
+  }
+
+  profile = null;
+
+  customers = [];
+  visits = [];
+  payments = [];
+  reminders = [];
+
+  clearMarkers();
+
+  setSignedIn(false);
+
+  loginMessage('Sesión cerrada.','success');
+
+});
+
+
+sb.auth.onAuthStateChange((event,session) => {
+
+  if (event === 'SIGNED_OUT') {
+
+    profile = null;
+
+    setSignedIn(false);
+
+  }
+
+});
+
+
+/* ======================================================
+   INSTALLATION PAYMENT STATUS
+====================================================== */
+
+function firstDue(customer) {
+
+  if (!customer.installation_date) {
+    return null;
+  }
+
+  const installation = new Date(
+    customer.installation_date + 'T12:00:00'
+  );
+
+  const year = installation.getFullYear();
+  const month = installation.getMonth();
+
+  if (installation.getDate() <= 15) {
+
+    return new Date(year,month+1,1);
+
+  }
+
+  return new Date(year,month+2,1);
+
+}
+
+
+function customerStatus(customer) {
+
+  const due = firstDue(customer);
+
+  if (due) {
+
+    const today = new Date();
+
+    if (today >= due) {
+
+      return {
+        text:'Primera mensualidad pendiente',
+        emoji:'🔴',
+        cls:'red'
+      };
+
+    }
+
+    return {
+      text:'Primera mensualidad aún no vence',
+      emoji:'🔵',
+      cls:'blue'
+    };
+
+  }
+
+  const paid = payments.some(payment => {
+
+    return (
+      payment.customer_id === customer.id &&
+      dateOnly(payment.billing_month) === monthStart()
+    );
+
+  });
+
+  if (paid) {
+
+    return {
+      text:'Pagado este mes',
+      emoji:paidEmoji,
+      cls:'green'
+    };
+
+  }
+
+  const visited = visits.some(visit => {
+
+    const visitDate = dateOnly(
+      visit.visited_at || visit.created_at
+    );
+
+    return (
+      visit.customer_id === customer.id &&
+      visitDate >= monthStart()
+    );
+
+  });
+
+  if (visited) {
+
+    return {
+      text:'Visitado, falta pago',
+      emoji:'⭐',
+      cls:'yellow'
+    };
+
+  }
+
+  return {
+    text:'Sin visita este mes',
+    emoji:'📍',
+    cls:'blue'
+  };
+
+}
+
+
+function markerColor(customer) {
+
+  const status = customerStatus(customer);
+
+  if (status.cls === 'red') return '#ff5964';
+  if (status.cls === 'green') return '#21c58b';
+  if (status.cls === 'yellow') return '#ffbf47';
+
+  if (firstDue(customer)) return '#2684ff';
+
+  return '#39d5e8';
+
+}
+
+
+/* ======================================================
+   LOAD DATABASE DATA
+====================================================== */
+
+async function loadAll() {
+
+  $('mapCount').textContent = 'Cargando…';
+
+  const results = await Promise.all([
+
+    sb.from('customers')
+      .select('*')
+      .order('created_at',{ascending:false}),
+
+    sb.from('visits')
+      .select('*')
+      .order('created_at',{ascending:false})
+      .limit(200),
+
+    sb.from('payments')
+      .select('*')
+      .order('created_at',{ascending:false})
+      .limit(200),
+
+    sb.from('reminders')
+      .select('*')
+      .order('created_at',{ascending:false})
+      .limit(200)
+
+  ]);
+
+  const customerResult = results[0];
+
+  if (customerResult.error) {
+    throw customerResult.error;
+  }
+
+  customers = customerResult.data || [];
+
+  visits = results[1].error ? [] : (results[1].data || []);
+  payments = results[2].error ? [] : (results[2].data || []);
+  reminders = results[3].error ? [] : (results[3].data || []);
+
+  $('nCustomers').textContent = customers.length;
+
+  $('nVisits').textContent = visits.filter(visit => {
+
+    return dateOnly(
+      visit.visited_at || visit.created_at
+    ) >= monthStart();
+
+  }).length;
+
+  $('nPaid').textContent = payments.filter(payment => {
+
+    return dateOnly(payment.billing_month) === monthStart();
+
+  }).length;
+
+  $('nDue').textContent = customers.filter(customer => {
+
+    const status = customerStatus(customer);
+
+    return (
+      status.cls === 'red' ||
+      status.cls === 'yellow'
+    );
+
+  }).length;
+
+  renderMarkers();
+  renderCustomers();
+  renderReadOnlyLists();
+
+  $('mapCount').textContent =
+    customers.length + ' clientes';
+
+}
+
+
+/* ======================================================
+   MAP
+====================================================== */
+
+function initMap() {
+
+  if (map) {
+    setTimeout(() => map.resize(),100);
+    return;
+  }
+
+  if (!window.maplibregl) {
+    alert('No se pudo cargar el mapa. Revisa tu conexión.');
+    return;
+  }
+
+  map = new maplibrelet reminders = [];
 let profile = null;
 let paidEmoji = localStorage.getItem('rumboPaidEmoji') || '💰';
 let holdTimer = null;
