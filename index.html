@@ -6,102 +6,422 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#101827">
   <title>Rumbo | Tu mapa de trabajo</title>
+
+  <!-- MapLibre -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css"
+    rel="stylesheet"
+  >
+
   <style>
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #101827;
       color: #f8fafc;
     }
+
     header {
-      padding: 18px;
+      padding: 16px;
       background: #172337;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
+
     header h1 { margin: 0; font-size: 25px; }
     header p { margin: 4px 0 0; color: #9caec4; font-size: 12px; }
-    .status { color: #4ade80; font-size: 12px; }
+
+    .status {
+      color: #4ade80;
+      font-size: 12px;
+    }
+
     main { padding: 16px; }
-    .map {
-      height: 58vh;
-      min-height: 300px;
-      background: #243449;
-      border: 1px solid #3b4d64;
+
+    #login {
+      max-width: 420px;
+      margin: 45px auto;
+      padding: 22px;
+      background: #172337;
       border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: #cbd5e1;
-      padding: 20px;
     }
-    .actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 16px;
+
+    #login h2 { margin-top: 0; }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin: 8px 0;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      background: #243449;
+      color: white;
+      font-size: 16px;
     }
+
     button {
       border: 0;
-      border-radius: 10px;
-      padding: 15px 10px;
+      border-radius: 9px;
+      padding: 13px 16px;
       background: #2563eb;
       color: white;
       font-size: 14px;
       font-weight: bold;
+      cursor: pointer;
     }
+
     button.secondary { background: #334155; }
+
+    #login button { width: 100%; margin-top: 10px; }
+
+    #loginMessage {
+      color: #fca5a5;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    #workspace { display: none; }
+
+    #map {
+      height: 68vh;
+      min-height: 350px;
+      width: 100%;
+      border-radius: 13px;
+      overflow: hidden;
+      background: #243449;
+    }
+
+    .map-actions {
+      display: flex;
+      gap: 10px;
+      margin: 12px 0;
+      flex-wrap: wrap;
+    }
+
+    #mapMessage {
+      color: #cbd5e1;
+      font-size: 13px;
+      margin: 10px 0;
+    }
+
+    .customer-marker {
+      width: 18px;
+      height: 18px;
+      border: 3px solid white;
+      border-radius: 50%;
+      background: #2563eb;
+      box-shadow: 0 1px 6px #0008;
+    }
+
+    .maplibregl-popup-content {
+      color: #172337;
+      border-radius: 9px;
+      font-size: 14px;
+    }
+
     footer {
       text-align: center;
-      padding: 20px;
+      padding: 18px;
       color: #94a3b8;
       font-size: 12px;
     }
   </style>
 </head>
+
 <body>
   <header>
     <div>
       <h1>Rumbo</h1>
       <p>Encuentra. Visita. Registra.</p>
     </div>
-    <span class="status">● En línea</span>
+    <span class="status">● Rumbo</span>
   </header>
 
   <main>
-    <div class="map">
-      <div>
-        <h2>Tu mapa de trabajo</h2>
-        <p>El mapa interactivo se conectará aquí.</p>
-      </div>
-    </div>
+    <section id="login">
+      <h2>Iniciar sesión</h2>
+      <p>Ingresa con tu cuenta de Rumbo.</p>
 
-    <div class="actions">
-      <button onclick="alert('La función de clientes se agregará próximamente.')">
-        Clientes
-      </button>
-      <button class="secondary" onclick="alert('Los recordatorios se agregarán próximamente.')">
-        Recordatorios
-      </button>
-    </div>
+      <form id="loginForm">
+        <input
+          id="email"
+          type="email"
+          placeholder="Correo electrónico"
+          autocomplete="username"
+          required
+        >
+
+        <input
+          id="password"
+          type="password"
+          placeholder="Contraseña"
+          autocomplete="current-password"
+          required
+        >
+
+        <button type="submit" id="loginButton">
+          Entrar a Rumbo
+        </button>
+      </form>
+
+      <p id="loginMessage"></p>
+    </section>
+
+    <section id="workspace">
+      <div class="map-actions">
+        <button id="gpsButton">Mi ubicación</button>
+        <button id="logoutButton" class="secondary">Cerrar sesión</button>
+      </div>
+
+      <div id="map"></div>
+      <p id="mapMessage">Preparando el mapa...</p>
+    </section>
   </main>
 
   <footer>Rumbo · Tu mapa de trabajo</footer>
-<!-- Supabase library -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<!-- Rumbo configuration -->
-<script src="./config.js"></script>
+  <!-- Libraries and project configuration -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="./config.js"></script>
 
-<!-- Initialize Rumbo connection -->
-<script>
-  window.rumboSupabase = window.supabase.createClient(
-    window.RUMBO_CONFIG.supabaseUrl,
-    window.RUMBO_CONFIG.supabaseKey
-  );
-</script>
+  <script>
+    const supabaseClient = window.supabase.createClient(
+      window.RUMBO_CONFIG.supabaseUrl,
+      window.RUMBO_CONFIG.supabaseKey
+    );
+
+    let map = null;
+    let mapInitialized = false;
+    let customerMarkers = [];
+
+    const loginSection = document.getElementById("login");
+    const workspace = document.getElementById("workspace");
+    const loginMessage = document.getElementById("loginMessage");
+    const mapMessage = document.getElementById("mapMessage");
+
+    function showWorkspace() {
+      loginSection.style.display = "none";
+      workspace.style.display = "block";
+
+      if (!mapInitialized) {
+        initializeMap();
+      } else {
+        setTimeout(() => map.resize(), 100);
+      }
+    }
+
+    function showLogin() {
+      workspace.style.display = "none";
+      loginSection.style.display = "block";
+    }
+
+    async function initializeMap() {
+      mapInitialized = true;
+
+      map = new maplibregl.Map({
+        container: "map",
+        style: {
+          version: 8,
+          sources: {
+            osm: {
+              type: "raster",
+              tiles: [
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+              ],
+              tileSize: 256,
+              attribution: "© OpenStreetMap contributors"
+            }
+          },
+          layers: [
+            {
+              id: "osm-layer",
+              type: "raster",
+              source: "osm"
+            }
+          ]
+        },
+        center: [-90.5069, 15.7835],
+        zoom: 7
+      });
+
+      map.addControl(
+        new maplibregl.NavigationControl(),
+        "top-right"
+      );
+
+      map.on("load", loadCustomers);
+
+      map.on("error", () => {
+        mapMessage.textContent =
+          "No se pudo cargar una parte del mapa. Revisa tu conexión.";
+      });
+    }
+
+    async function loadCustomers() {
+      mapMessage.textContent = "Cargando clientes...";
+
+      const { data, error } = await supabaseClient
+        .from("customers")
+        .select(
+          "id, full_name, latitude, longitude, customer_type, service_type, monthly_amount"
+        );
+
+      if (error) {
+        mapMessage.textContent =
+          "No se pudieron cargar los clientes: " + error.message;
+        return;
+      }
+
+      customerMarkers.forEach(marker => marker.remove());
+      customerMarkers = [];
+
+      let validCount = 0;
+
+      (data || []).forEach(customer => {
+        const lat = Number(customer.latitude);
+        const lon = Number(customer.longitude);
+
+        if (
+          !Number.isFinite(lat) ||
+          !Number.isFinite(lon) ||
+          lat < -90 || lat > 90 ||
+          lon < -180 || lon > 180
+        ) {
+          return;
+        }
+
+        const markerElement = document.createElement("div");
+        markerElement.className = "customer-marker";
+
+        const popupContent = document.createElement("div");
+
+        const name = document.createElement("strong");
+        name.textContent = customer.full_name || "Cliente";
+        popupContent.appendChild(name);
+
+        const service = document.createElement("p");
+        service.textContent =
+          "Servicio: " + (customer.service_type || "No especificado");
+        popupContent.appendChild(service);
+
+        const type = document.createElement("p");
+        type.textContent =
+          "Tipo: " + (customer.customer_type || "No especificado");
+        popupContent.appendChild(type);
+
+        const popup = new maplibregl.Popup({ offset: 15 })
+          .setDOMContent(popupContent);
+
+        const marker = new maplibregl.Marker({
+          element: markerElement
+        })
+          .setLngLat([lon, lat])
+          .setPopup(popup)
+          .addTo(map);
+
+        customerMarkers.push(marker);
+        validCount++;
+      });
+
+      mapMessage.textContent =
+        validCount + " clientes cargados en el mapa.";
+    }
+
+    document.getElementById("loginForm").addEventListener(
+      "submit",
+      async event => {
+        event.preventDefault();
+
+        loginMessage.textContent = "Iniciando sesión...";
+
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+
+        const { error } = await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) {
+          loginMessage.textContent =
+            "No se pudo iniciar sesión: " + error.message;
+          return;
+        }
+
+        loginMessage.textContent = "";
+        showWorkspace();
+      }
+    );
+
+    document.getElementById("logoutButton").addEventListener(
+      "click",
+      async () => {
+        await supabaseClient.auth.signOut();
+        showLogin();
+      }
+    );
+
+    document.getElementById("gpsButton").addEventListener(
+      "click",
+      () => {
+        if (!navigator.geolocation) {
+          mapMessage.textContent =
+            "Este navegador no permite obtener la ubicación.";
+          return;
+        }
+
+        mapMessage.textContent = "Buscando tu ubicación...";
+
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            map.flyTo({
+              center: [lon, lat],
+              zoom: 16
+            });
+
+            mapMessage.textContent =
+              "Tu ubicación: " + lat.toFixed(6) + ", " +
+              lon.toFixed(6);
+          },
+          error => {
+            mapMessage.textContent =
+              "No se pudo obtener la ubicación. Revisa los permisos GPS.";
+          },
+          { enableHighAccuracy: true, timeout: 15000 }
+        );
+      }
+    );
+
+    async function checkSession() {
+      const { data, error } = await supabaseClient.auth.getSession();
+
+      if (error) {
+        loginMessage.textContent = error.message;
+        showLogin();
+        return;
+      }
+
+      if (data.session) {
+        showWorkspace();
+      } else {
+        showLogin();
+      }
+    }
+
+    supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT") {
+        showLogin();
+      }
+    });
+
+    checkSession();
+  </script>
 </body>
 </html>
