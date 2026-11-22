@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101827">
+  <title>Rumbo | Tu mapa de trabajo</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #101827;
+      color: #f8fafc;
+    }
+    header {
+      padding: 18px;
+      background: #172337;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { margin: 0; font-size: 25px; }
+    header p { margin: 4px 0 0; color: #9caec4; font-size: 12px; }
+    .status { color: #4ade80; font-size: 12px; }
+    main { padding: 16px; }
+    .map {
+      height: 58vh;
+      min-height: 300px;
+      background: #243449;
+      border: 1px solid #3b4d64;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #cbd5e1;
+      padding: 20px;
+    }
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 15px 10px;
+      background: #2563eb;
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    button.secondary { background: #334155; }
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #94a3b8;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Rumbo</h1>
+      <p>Encuentra. Visita. Registra.</p>
+    </div>
+    <span class="status">● En línea</span>
+  </header>
+
+  <main>
+    <div class="map">
+      <div>
+        <h2>Tu mapa de trabajo</h2>
+        <p>El mapa interactivo se conectará aquí.</p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button onclick="alert('La función de clientes se agregará próximamente.')">
+        Clientes
+      </button>
+      <button class="secondary" onclick="alert('Los recordatorios se agregarán próximamente.')">
+        Recordatorios
+      </button>
+    </div>
+  </main>
+
+  <footer>Rumbo · Tu mapa de trabajo</footer>
+</body>
+</html>
