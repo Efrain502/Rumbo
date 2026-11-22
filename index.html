@@ -90,5 +90,18 @@
   </main>
 
   <footer>Rumbo · Tu mapa de trabajo</footer>
+<!-- Supabase library -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Rumbo configuration -->
+<script src="./config.js"></script>
+
+<!-- Initialize Rumbo connection -->
+<script>
+  window.rumboSupabase = window.supabase.createClient(
+    window.RUMBO_CONFIG.supabaseUrl,
+    window.RUMBO_CONFIG.supabaseKey
+  );
+</script>
 </body>
 </html>
